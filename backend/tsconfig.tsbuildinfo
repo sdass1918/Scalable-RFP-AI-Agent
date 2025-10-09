@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/agents/mainagent.ts","./src/routes/rfproutes.ts","./src/services/gemini.ts","./src/tools/dataquerytools.ts","./src/tools/webandfiletools.ts"],"version":"5.8.3"}

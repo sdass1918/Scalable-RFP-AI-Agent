@@ -1,0 +1,5 @@
+SKU,ProductName,VoltageRating,ConductorMaterial,InsulationType
+W-CU-XLPE-1.1,1.1kV Copper XLPE Cable,1.1kV,Copper,XLPE
+W-CU-PVC-1.1,1.1kV Copper PVC Cable,1.1kV,Copper,PVC
+W-AL-XLPE-1.1,1.1kV Aluminium XLPE Cable,1.1kV,Aluminium,XLPE
+W-CU-PVC-0.6,650V Copper PVC Cable,650V,Copper,PVC

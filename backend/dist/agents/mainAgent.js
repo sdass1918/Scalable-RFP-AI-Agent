@@ -18,7 +18,10 @@ const getRfpWebsiteContents = {
     description: 'Gets the text content from the tender and RFP website.',
     parametersJsonSchema: {
         type: 'object',
-        properties: {}
+        properties: {
+            url: { type: 'string', description: 'The URL of the RFP or tender website to scrape content from.' },
+        },
+        required: ['url']
     },
 };
 const findProductsBySku = {
@@ -46,7 +49,7 @@ const toolFunctions = {
     findProductBySku: dataQueryTools_1.findProductBySku,
     getItemPrice: dataQueryTools_1.getItemPrice,
 };
-const runRfpProcess = () => __awaiter(void 0, void 0, void 0, function* () {
+const runRfpProcess = (url) => __awaiter(void 0, void 0, void 0, function* () {
     const chat = gemini_1.ai.chats.create({
         model: "gemini-2.5-flash",
         config: {
@@ -57,9 +60,9 @@ const runRfpProcess = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log('--- Running Sales Agent ---');
     const salesAgentPrompt = `
     You are a Sales Agent for a wires and cables company.
-    Your task is to identify relevant RFPs.
+    Your task is to identify relevant RFPs from the website URL provided.
     Today's date is ${new Date().toLocaleDateString('en-GB')}.
-    Use the getRfpWebsiteContent tool to scan for RFPs due in the next 3 months.
+    Use the getRfpWebsiteContent tool with the URL "${url}" to scan for RFPs due in the next 3 months.
     From the relevant RFPs, select the one with the soonest due date and summarize its key requirements.
     Only provide the summary of the single, most urgent, and relevant RFP.
   `;
@@ -112,10 +115,37 @@ const runAgent = (chat_1, prompt_1, ...args_1) => __awaiter(void 0, [chat_1, pro
     var _a;
     const result = yield chat.sendMessage({ message: prompt });
     const call = (_a = result.functionCalls) === null || _a === void 0 ? void 0 : _a[0];
-    if (call && useTools) {
-        console.log(`[Agent Action] Calling tool: ${call.name}`);
-        // @ts-ignore
-        const apiResult = yield toolFunctions[call.name](...Object.values(call.args));
+    if (call && useTools && call.args) {
+        console.log(`[Agent Action] Calling tool: ${call.name} with args:`, call.args);
+        let apiResult;
+        try {
+            // Handle different tool functions with their specific parameter requirements
+            if (call.name === 'getRfpWebsiteContent') {
+                const url = call.args.url;
+                if (!url)
+                    throw new Error('URL parameter is required for getRfpWebsiteContent');
+                apiResult = yield (0, webAndFileTools_1.getRfpWebsiteContent)(url);
+            }
+            else if (call.name === 'findProductBySku') {
+                const sku = call.args.sku;
+                if (!sku)
+                    throw new Error('SKU parameter is required for findProductBySku');
+                apiResult = yield (0, dataQueryTools_1.findProductBySku)(sku);
+            }
+            else if (call.name === 'getItemPrice') {
+                const itemName = call.args.itemName;
+                if (!itemName)
+                    throw new Error('itemName parameter is required for getItemPrice');
+                apiResult = yield (0, dataQueryTools_1.getItemPrice)(itemName);
+            }
+            else {
+                throw new Error(`Unknown tool function: ${call.name}`);
+            }
+        }
+        catch (error) {
+            console.error(`Error calling tool ${call.name}:`, error);
+            apiResult = `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`;
+        }
         const nextResult = yield chat.sendMessage({
             message: [
                 {

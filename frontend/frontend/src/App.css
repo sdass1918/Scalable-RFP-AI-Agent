@@ -12,3 +12,17 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.input {
+  margin-bottom: 10px;
+  height: 45px;
+}
+
+.url {
+  margin-bottom: 5px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+}

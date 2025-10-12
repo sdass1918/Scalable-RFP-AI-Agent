@@ -16,8 +16,12 @@ const router = (0, express_1.Router)();
 exports.rfpRoutes = router;
 router.post('/process', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('RFP processing request received...');
-        const result = yield (0, mainAgent_1.runRfpProcess)();
+        const url = req.body.url;
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required in the request body.' });
+        }
+        console.log(`RFP processing request received for URL: ${url}`);
+        const result = yield (0, mainAgent_1.runRfpProcess)(url);
         console.log('RFP processing finished.');
         res.json(result);
     }

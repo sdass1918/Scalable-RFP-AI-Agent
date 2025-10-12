@@ -46,14 +46,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRfpWebsiteContent = void 0;
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
+// import fs from 'fs/promises';
+// import path from 'path';
+const axios_1 = __importDefault(require("axios"));
 const cheerio = __importStar(require("cheerio"));
-const getRfpWebsiteContent = () => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path_1.default.join(process.cwd(), 'data', 'sampleRfpWebsite.html');
-    const htmlContent = yield promises_1.default.readFile(filePath, 'utf-8');
+const getRfpWebsiteContent = (url) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`[Tool] Scraping content from live URL: ${url}`);
+    const response = yield axios_1.default.get(url);
+    const htmlContent = response.data;
+    // const filePath = path.join(process.cwd(), 'data', 'sampleRfpWebsite.html');
+    // const htmlContent = await fs.readFile(filePath, 'utf-8');
     const $ = cheerio.load(htmlContent);
     const textContent = $('body').text().replace(/\s\s+/g, ' ').trim();
-    return textContent;
+    return textContent.substring(0, 4000);
 });
 exports.getRfpWebsiteContent = getRfpWebsiteContent;

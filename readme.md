@@ -1,1 +1,1 @@
-![Flow Chart](./assets/flowchart.png)
+![Flow Chart](assets/flowchart.png)
